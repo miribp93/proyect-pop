@@ -1,0 +1,10 @@
+<h1 class="text-center container ">Todos los Productos y Servicios</h1>
+
+<mat-divider></mat-divider>
+
+
+<div class="row g-4 pt-2">
+  <div *ngFor="let producto of prod" class="col-12 col-sm-6 col-md-4 col-lg-3">
+    <productos-prod-card [prod]="producto"></productos-prod-card>
+  </div>
+</div>
