@@ -1,4 +1,4 @@
 package com.guaguaupop.guaguaupop.controller;
 
-public class ServiceController {
+public class AdController {
 }
