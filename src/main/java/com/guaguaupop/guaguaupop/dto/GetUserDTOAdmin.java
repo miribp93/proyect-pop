@@ -10,15 +10,13 @@ import lombok.*;
 public class GetUserDTOAdmin {
 
     private String username;
-    private String password;
     private String name;
     private String lastName1;
     private String lastName2;
     private String email;
     private Integer phone;
-    private Long addressId;
-    private Long cityId;
-    private Long countryId;
-    private Long postalCodeId;
+    private String street;
+    private String city;
+    private Integer postalCode;
     private byte[] profilePhoto;
 }

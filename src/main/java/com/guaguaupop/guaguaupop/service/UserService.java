@@ -7,37 +7,42 @@ import com.guaguaupop.guaguaupop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService extends BaseService<User, Long, UserRepository>{
+public class UserService extends BaseService<User, Long, UserRepository> {
 
+    private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
 
     public Optional<User> findUserByUsername(String username){
         return this.repository.findByUsername(username);
     }
 
-    public User createUser(CreateUserDTO newUser) {
-        if (newUser.getPassword().contentEquals(newUser.getPassword2())) {
+    public User createUser(CreateUserDTO  createUserDto) {
+        if (createUserDto.getPassword().contentEquals(createUserDto.getPassword2())) {
             User user = User.builder()
-                    .username(newUser.getUsername())
-                    .password(passwordEncoder.encode(newUser.getPassword()))
-                    .name(newUser.getName())
-                    .lastName1(newUser.getLastName1())
-                    .lastName2(newUser.getLastName2())
-                    .email(newUser.getEmail())
-                    .phone(newUser.getPhone())
-                    .address(new Address(newUser.getAddressDTO())) // Pasa el DTO
-                    .city(new City(newUser.getCityDTO())) // Pasa el DTO
-                    .country(new Country(newUser.getCountryDTO())) // Pasa el DTO
-                    .postalCode(new PostalCode(newUser.getPostalCodeDTO())) // Pasa el DTO
-                    .profilePhoto(newUser.getProfilePhoto())
+                    .username(createUserDto.getUsername())
+                    .password(passwordEncoder.encode(createUserDto.getPassword()))
+                    .name(createUserDto.getName())
+                    .lastName1(createUserDto.getLastName1())
+                    .lastName2(createUserDto.getLastName2())
+                    .email(createUserDto.getEmail())
+                    .phone(createUserDto.getPhone())
+                    .street(createUserDto.getStreet())
+                    .city(createUserDto.getCity())
+                    .postalCode(createUserDto.getPostalCode())
+                    .profilePhoto(createUserDto.getProfilePhoto())
                     .build();
             return save(user);
         } else {
             throw new NewUserWithDifferentPasswordsException();
         }
+    }
+
+    public Optional<User> getUser(Long id) {
+        return this.repository.findById(id);
     }
 }

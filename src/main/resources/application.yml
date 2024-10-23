@@ -2,8 +2,8 @@
 spring:
     datasource:
         url: jdbc:postgresql://localhost:5432/bbdd_proyecto_miri_lucas
-        username: proyecto
-        password: proyecto
+        username: postgres
+        password: 333333
         #driver-class-name: org.postgresql.Driver
        # validation-query: SELECT 1
         #initialize: true

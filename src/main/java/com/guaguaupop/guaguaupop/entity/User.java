@@ -1,6 +1,7 @@
 package com.guaguaupop.guaguaupop.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,14 +14,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@NamedQuery(name="User.findByEmail", query = "select u from User where u.email=:email")
 @Builder
 @Data
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor //constructor vacío
-@AllArgsConstructor //constructor con todos los parámetros
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "\"user\"")
 @Entity
 public class User implements UserDetails {
 
@@ -35,6 +36,7 @@ public class User implements UserDetails {
     private String username;
 
     private String password;
+    private String password2;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -51,34 +53,19 @@ public class User implements UserDetails {
     @Column(name = "phone", nullable = false, length = 15)
     private Integer phone;
 
-    @ManyToOne
-    @JoinColumn(name = "idAddress", referencedColumnName = "idAddress")
-    private Address address;
+    @Column(name = "street", nullable = false)
+    private String street;
 
-    @ManyToOne
-    @JoinColumn(name = "idCity", referencedColumnName = "idCity")
-    private City city;
+    @Column(name = "city", nullable = false)
+    private String city;
 
-    @ManyToOne
-    @JoinColumn(name = "idCountry", referencedColumnName = "idCountry")
-    private Country country;
-
-    @ManyToOne
-    @JoinColumn(name = "idPostalCode", referencedColumnName = "idPostalCode")
-    private PostalCode postalCode;
+    @Column(name = "postalCode", nullable = false)
+    @Pattern(regexp = "\\d{5}", message = "El código postal debe tener 5 dígitos")
+    private Integer postalCode;
 
     @Lob
     @Column
     private byte[] profilePhoto;
-
-    @OneToMany(mappedBy = "sender")
-    private List<Message> messagesSent;
-
-    @OneToMany(mappedBy = "receiver")
-    private List<Message> messagesReceived;
-
-    @OneToMany(mappedBy = "user")
-    private List<Ad> products;
 
     @OneToMany(mappedBy = "user")
     private List<Ad> services;
@@ -98,13 +85,15 @@ public class User implements UserDetails {
     @Builder.Default
     private LocalDateTime lastPasswordChangeAt = LocalDateTime.now();
 
-    /*@Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }*/
+    //
 
     @Override
     public String getPassword() {
+        return "";
+    }
+
+    @Override
+    public String getUsername() {
         return "";
     }
 
@@ -127,4 +116,38 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
+    /*@ManyToOne
+    @JoinColumn(name = "idAddress", referencedColumnName = "idAddress")
+    private Address address;
+
+    @ManyToOne
+    @JoinColumn(name = "idCity", referencedColumnName = "idCity")
+    private City city;
+
+    @ManyToOne
+    @JoinColumn(name = "idCountry", referencedColumnName = "idCountry")
+    private Country country;
+
+    @ManyToOne
+    @JoinColumn(name = "idPostalCode", referencedColumnName = "idPostalCode")
+    private PostalCode postalCode;
+
+    @OneToMany(mappedBy = "sender")
+    private List<Message> messagesSent;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Message> messagesReceived;
+
+    @OneToMany(mappedBy = "user")
+    private List<Ad> products;
+
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }*/
+
+
 }

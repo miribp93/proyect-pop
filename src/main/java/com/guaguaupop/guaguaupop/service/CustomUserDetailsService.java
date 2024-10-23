@@ -10,16 +10,16 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserService userServiceImpl;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userService.findUserByUsername(username)
+        return userServiceImpl.findUserByUsername(username)
                 .orElseThrow(()->new UsernameNotFoundException(username + "no encontrado"));
     }
 
     public UserDetails loadUserById(Long id) throws UsernameNotFoundException{
-        return userService.findById(id)
+        return userServiceImpl.findById(id)
                 .orElseThrow(()->new UsernameNotFoundException("Usuario " + id + " no encontrado"));
     }
 }

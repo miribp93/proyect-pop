@@ -26,12 +26,12 @@ public class Message {
     @Column(nullable = false)
     private Date timestamp;
 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumn(name = "idSender", referencedColumnName = "idSender")
     private User sender;
 
     @ManyToOne
     @JoinColumn(name = "idReceiver", referencedColumnName = "idReceiver")
-    private User receiver;
+    private User receiver;*/
 }
 

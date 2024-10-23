@@ -17,9 +17,8 @@ public class CreateUserDTO {
     private String lastName2;
     private String email;
     private Integer phone;
-    private AddressDTO addressDTO;
-    private CityDTO cityDTO;
-    private CountryDTO countryDTO;
-    private PostalCodeDTO postalCodeDTO;
+    private String street;
+    private String city;
+    private Integer postalCode;
     private byte[] profilePhoto;
 }
