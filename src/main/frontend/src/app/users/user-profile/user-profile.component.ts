@@ -2,23 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AdService } from '../../services/ad.service';
-import { User } from '../../interfaces/user.interface';
+import { ChatService } from '../../services/chat.service';
+import { Chat, User } from '../../interfaces/user.interface';
+import { Ad } from '../../interfaces/anuncio.interfaces';
+import { NotificationService } from '../../services/notification.service';
+import { PageEvent } from '@angular/material/paginator';
+import { forkJoin, map } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MATERIAL_MODULES } from '../../components/material/material.component';
 import { FormsModule } from '@angular/forms';
-import { Ad } from '../../interfaces/anuncio.interfaces';
-import { PageEvent } from '@angular/material/paginator';
-import { NotificationService } from '../../services/notification.service';
-import { forkJoin, map } from 'rxjs';
 import { UserAdCardComponent } from "../user-card/user-card.component";
-;
-
 
 @Component({
   selector: 'app-userProfile',
   standalone: true,
-  imports: [CommonModule, FormsModule, MATERIAL_MODULES,UserAdCardComponent],
-  providers: [AdService],
+  imports: [CommonModule, FormsModule, MATERIAL_MODULES, UserAdCardComponent],
+  providers: [AdService, ChatService],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css'],
 })
@@ -29,22 +28,27 @@ export class UserProfileComponent implements OnInit {
   photoPreview?: string | ArrayBuffer | null;
   isFileSelected: boolean = false;
 
+  // Variables para mensajes
+  selectedChat: any = null;
+  newMessage: string = '';
+  chats$: any[] = []; // Lista de chats
+
   constructor(
     private authService: AuthService,
     private adService: AdService,
+    private chatService: ChatService,
     private router: Router,
     private alert: NotificationService
   ) {
-      // Enlace explícito de los métodos para asegurar el contexto
     this.modificarAnuncio = this.modificarAnuncio.bind(this);
     this.deleteAd = this.deleteAd.bind(this);
   }
 
-  public ads: Ad[] = []; // Lista completa de productos
-  public paginatedProd: Ad[] = []; // Lista de productos paginados
-  public pageSize = 12; // Tamaño de la página (productos por página)
-  public pageIndex = 0; // Índice de la página actual
-  public totalLength = 0; // Total de productos
+  public ads: Ad[] = [];
+  public paginatedProd: Ad[] = [];
+  public pageSize = 12;
+  public pageIndex = 0;
+  public totalLength = 0;
 
   ngOnInit(): void {
     // Cargar datos del usuario
@@ -56,6 +60,7 @@ export class UserProfileComponent implements OnInit {
         } else {
           this.loadProfilePhoto();  // Llamada explícita si no hay foto en los datos del usuario
         }
+        this.loadChats();  // Cargar los chats del usuario
       },
       (error) => console.error('Error al cargar usuario:', error)
     );
@@ -78,23 +83,24 @@ export class UserProfileComponent implements OnInit {
   }
 
 
+
   modificarDatos(): void {
     this.router.navigate(['/register'], { queryParams: { editMode: true } });
   }
 
   deleteUser(): void {
     if (confirm('¿Estás seguro de que deseas eliminar este anuncio?')) {
-    if (this.usuario) {
-      this.authService.deleteUser().subscribe(
-        () => {
-          this.alert.show('Cuenta eliminada con éxito');
-          this.router.navigate(['/home']);
-        },
-        (error) => console.error('Error al eliminar usuario:', error)
-      );
+      if (this.usuario) {
+        this.authService.deleteUser().subscribe(
+          () => {
+            this.alert.show('Cuenta eliminada con éxito');
+            this.router.navigate(['/home']);
+          },
+          (error) => console.error('Error al eliminar usuario:', error)
+        );
+      }
     }
   }
-}
 
   logout(): void {
     this.authService.logout();
@@ -105,14 +111,13 @@ export class UserProfileComponent implements OnInit {
     const fileInput = event.target as HTMLInputElement;
     if (fileInput.files && fileInput.files.length > 0) {
       this.selectedFile = fileInput.files[0];
-      this.isFileSelected = true; // Asegura que el formulario de subida de foto sea visible
+      this.isFileSelected = true;
 
       const reader = new FileReader();
       reader.onload = () => (this.photoPreview = reader.result);
       reader.readAsDataURL(this.selectedFile);
     }
   }
-
 
   uploadPhoto(): void {
     if (this.selectedFile) {
@@ -125,17 +130,11 @@ export class UserProfileComponent implements OnInit {
           if (response.photoUrl) {
             this.photoPreview = response.photoUrl;
             this.isFileSelected = false;
+            this.selectedFile = null;
 
-            // Restablecer el archivo seleccionado para ocultar el botón "Seleccionar archivo"
-            this.selectedFile = null; // Limpiar el archivo seleccionado
-
-            // Recargar el usuario para obtener la foto actualizada
             this.authService.getCurrentUser().subscribe((user) => {
               this.usuario = user;
               this.photoPreview = user.profile_photo;
-
-              // No es necesario recargar la página, solo actualizamos el estado
-              // location.reload(); // Remover esta línea, ya que no es necesario recargar la página
             });
           }
         },
@@ -144,37 +143,29 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
-
-
-  // Mostrar el formulario para seleccionar archivo
   selectFile(): void {
     this.isFileSelected = !this.isFileSelected;
   }
 
-
-//METODSOS PARA ANUNCIOS
+  // Métodos de anuncios
 
   loadAnuncios(): void {
     this.adService.getMyAds().subscribe(
       (ads) => {
-        console.log('Datos recibidos de anuncios privados:', ads);
-
-        // Procesar cada anuncio para obtener sus fotos
         const adRequests = ads.map((ad) =>
           this.adService.getAdPhoto(ad.id_ad).pipe(
             map((photos) => ({
               ...ad,
-              photos: photos.length > 0 ? [photos[0]] : [] // Solo tomar la primera foto o array vacío si no hay fotos
+              photos: photos.length > 0 ? [photos[0]] : []
             }))
           )
         );
 
-        // Combinar todas las llamadas de fotos
         forkJoin(adRequests).subscribe(
           (adsWithPhotos) => {
             this.ads = adsWithPhotos;
-            this.totalLength = this.ads.length; // Total de productos
-            this.setPaginatedProducts(); // Establecer productos paginados
+            this.totalLength = this.ads.length;
+            this.setPaginatedProducts();
           },
           (error) => console.error('Error al cargar fotos:', error)
         );
@@ -189,34 +180,90 @@ export class UserProfileComponent implements OnInit {
 
   modificarAnuncio(idAd: number): void {
     this.router.navigate(['/usercreateads'], { queryParams: { editMode: true, id: idAd } });
-    console.log(`Modificar anuncio ${idAd}`);
   }
 
   deleteAd(idAd: number): void {
-
     this.adService.deleteAd(idAd).subscribe(
       () => {
-        this.alert.show('Anucio eliminado con exito');
+        this.alert.show('Anuncio eliminado con éxito');
         this.loadAnuncios();
-
       },
-      (error) => console.error('Error al eliminar usuario:', error)
+      (error) => console.error('Error al eliminar anuncio:', error)
     );
   }
 
-  // Establece los productos que se mostrarán según la página actual y tamaño
   setPaginatedProducts(): void {
     const startIndex = this.pageIndex * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.paginatedProd = this.ads.slice(startIndex, endIndex); // Segmento de productos a mostrar
+    this.paginatedProd = this.ads.slice(startIndex, endIndex);
   }
 
-  // Método que maneja el cambio de página y tamaño de página
   onPageChange(event: PageEvent): void {
     this.pageSize = event.pageSize;
     this.pageIndex = event.pageIndex;
-    this.setPaginatedProducts(); // Actualizar los productos paginados
+    this.setPaginatedProducts();
+  }
+
+ // ✅ Cargar chats del usuario
+ loadChats(): void {
+  if (!this.usuario) return;
+
+  this.chatService.getUserChats().subscribe((chats) => {
+    this.chats$ = chats;
+    console.log('📩 Chats obtenidos:', this.chats$); // 🔍 Verificar formato de datos
+  });
+}
+
+
+// ✅ Seleccionar chat y cargar mensajes
+selectChat(chat: Chat): void {
+  console.log('📌 Chat seleccionado:', chat);
+  this.selectedChat = { ...chat, messages: chat.messages || [] };
+
+  const chatUsers = chat.chatId.split('_');
+  const receiverId = chatUsers.find((id) => id !== this.usuario?.username) ?? '';
+
+  if (receiverId) {
+    this.chatService.getMessagesWithUser(receiverId).subscribe((messages) => {
+      console.log('📨 Mensajes cargados para chat:', chat.chatId, messages);
+
+      // 🛠 Solución: Forzar actualización de Angular con un nuevo array
+      this.selectedChat.messages = [...messages];
+
+      // 🔍 Verificar en consola que realmente hay mensajes
+      console.log('🖥️ Mensajes en selectedChat:', this.selectedChat.messages);
+    });
   }
 }
 
 
+
+// ✅ Enviar un mensaje
+sendMessage(): void {
+  if (this.newMessage.trim() && this.selectedChat) {
+    const receiverId = this.selectedChat.chatId
+      .split('_')
+      .find((id: string) => id !== this.usuario?.username) ?? '';
+
+    if (!receiverId) {
+      console.error('❌ Error: No se pudo determinar el ID del receptor.');
+      return;
+    }
+
+    this.chatService.sendMessage(this.newMessage, receiverId).subscribe(() => {
+      // Agregar el mensaje localmente para que aparezca sin necesidad de recarga
+      this.selectedChat.messages.push({
+        senderId: this.usuario!.username,
+        receiverId,
+        content: this.newMessage,
+        timestamp: new Date().toISOString()
+      });
+
+      this.newMessage = ''; // Limpiar el campo de entrada
+    }, (error) => {
+      console.error('❌ Error al enviar mensaje:', error);
+    });
+  }
+}
+
+}

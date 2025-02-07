@@ -30,3 +30,8 @@ export interface UserSession {
   token: string;
   roles: string[];
 }
+
+export interface Chat {
+  chatId: string;
+  messages: { text: string; senderId: string; timestamp: string }[];
+}

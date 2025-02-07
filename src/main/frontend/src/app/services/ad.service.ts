@@ -12,7 +12,7 @@ import { environments } from '../../environments/environments';
   providedIn: 'root',
 })
 export class AdService {
-  private baseUrl: string = environments.baseUrl;
+  //private baseUrl: string = environments.baseUrl;
 
   constructor(private http: HttpClient) {} // Inyecta HttpClient
 

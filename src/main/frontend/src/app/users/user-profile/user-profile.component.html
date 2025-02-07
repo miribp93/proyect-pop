@@ -2,7 +2,7 @@
   <!-- Perfil de usuario -->
   <div class="user-profile">
     <div class="photo-upload">
-      <p class="text-center">{{usuario?.name}}</p>
+      <p class="text-center">{{ usuario?.name }}</p>
       <div class="photo-card">
         <img *ngIf="photoPreview" [src]="photoPreview" alt="Foto de perfil" class="profile-photo" />
         <p *ngIf="!photoPreview">Sin Foto</p>
@@ -20,7 +20,6 @@
           </button>
         </form>
       </div>
-
 
       <div class="buttons">
         <button mat-button color="primary" (click)="modificarDatos()">
@@ -46,7 +45,40 @@
       </app-user-Card>
     </div>
   </div>
-</div>
+
+  <div class="chat-section">
+    <h3>Tus Chats</h3>
+
+    <!-- Lista de Chats -->
+    <div class="chat-list">
+      <div *ngFor="let chat of chats$" (click)="selectChat(chat)" class="chat-item">
+        <p>Chat con {{ chat.chatId.replace(usuario?.username, '').replace('_', '') }}</p>
+      </div>
+    </div>
+
+    <!-- Ventana de Conversación -->
+    <div *ngIf="selectedChat" class="chat-window">
+      <h4>Conversación con {{ selectedChat.chatId.replace(usuario?.username, '').replace('_', '') }}</h4>
+
+      <!-- Mensajes -->
+      <div class="messages">
+        <div *ngFor="let message of selectedChat.messages"
+             [class.sent]="message.senderId === usuario?.username"
+             [class.received]="message.senderId !== usuario?.username">
+          <p>{{ message.content }}</p>
+        </div>
+      </div>
+
+
+      <!-- Input de Nuevo Mensaje -->
+      <div class="chat-input">
+        <textarea [(ngModel)]="newMessage" placeholder="Escribe un mensaje..." rows="2"></textarea>
+        <button mat-button (click)="sendMessage()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+
 <mat-paginator
   [length]="totalLength"
   [pageSize]="pageSize"

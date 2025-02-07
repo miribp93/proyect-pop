@@ -16,6 +16,7 @@ import { UserAdComponent } from './users/user-ad/user-ad.component';
 import { InfoFunctionComponent } from './components/info-function/info-function.component';
 import { SearchResultsComponent } from './pages/search-results/search-results.component';
 import { AdoptionsComponent } from './pages/adoptions/adoptions.component';
+import { ChatComponent } from './users/chat/chat.component';
 
 
 export const routes: Routes = [
@@ -40,6 +41,7 @@ export const routes: Routes = [
       { path: 'usercreateads', component: UserAdComponent },
       { path: 'infoventa',  component: InfoFunctionComponent},
       { path: 'search-result', component: SearchResultsComponent },
+      { path: 'chat/:receiverId', component: ChatComponent },
     ],
   },
 ];

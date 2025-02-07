@@ -25,5 +25,20 @@ body {
   border-color: #005cbb !important ;
 }
 
+.mat-mdc-card-outlined {
+border-color: white !important;;
+
+}
+
+.mat-mdc-card-content {
+  padding: 0 !important; /* Elimina el padding */
+}
+mat-mdc-card-content:first-child {
+  padding-top: 0 !important;
+}
+
+mat-card.mat-mdc-card.mdc-card.card.mat-mdc-card-outlined.mdc-card--outlined.ng-star-inserted{
+  padding-top: 0 !important;
+}
 
 

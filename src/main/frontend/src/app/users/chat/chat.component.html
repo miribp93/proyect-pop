@@ -1,0 +1,20 @@
+<div class="chat-modal">
+  <div class="chat-header">
+    <span>💬 Chateando con {{ receiverUsername }}</span>
+    <button class="close-button" (click)="closeChat.emit()">✖</button>
+  </div>
+
+  <div class="messages">
+    <div *ngFor="let msg of messages" [class.own]="msg.senderId === userId">
+      <div class="message">
+        <span class="message-content">{{ msg.content }}</span>
+        <small class="timestamp">{{ msg.timestamp | date: 'short' }}</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="message-input">
+    <input [(ngModel)]="message" placeholder="Escribe un mensaje..." />
+    <button (click)="sendMessage()">Enviar</button>
+  </div>
+</div>

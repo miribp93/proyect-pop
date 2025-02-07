@@ -32,13 +32,8 @@
         <div class="image-container">
           <!-- Mostramos la imagen activa o la alternativa si no hay fotos -->
           <ng-container *ngIf="anun.photos && anun.photos.length; else noImage">
-            <img
-              *ngFor="let photo of anun.photos; let i = index"
-              [src]="photo"
-              alt="Imagen del producto"
-              class="ad-photo"
-              [class.active]="i === currentIndex"
-            />
+            <img *ngFor="let photo of anun.photos; let i = index" [src]="photo" alt="Imagen del producto"
+              class="ad-photo" [class.active]="i === currentIndex" />
           </ng-container>
           <!-- Plantilla para imagen alternativa -->
           <ng-template #noImage>
@@ -70,7 +65,7 @@
             </p>
 
             <p><b>Categoría: </b>{{ anun.category }}</p>
-            <p ><b>Descripción: </b>{{ anun.description }}</p><br><br>
+            <p><b>Descripción: </b>{{ anun.description }}</p><br><br>
             <p class="precio"><b>Precio: </b>{{ anun.price | currency:'EUR':'symbol' }}</p>
           </mat-list>
 
@@ -80,6 +75,18 @@
           </div>
 
           <p class="mt-2"><b>Vendido por: </b>{{ anun.creator?.username }}</p>
+          <button mat-flat-button (click)="openChat()">
+            Chatear con el vendedor
+          </button>
+
+          <!-- Ventana flotante del chat -->
+          <app-chat *ngIf="chatOpen" [receiverId]="selectedReceiverId" [receiverUsername]="selectedReceiverUsername"
+            (closeChat)="closeChat()">
+          </app-chat>
+
+
+
+
         </mat-card-content>
       </mat-card>
     </div>

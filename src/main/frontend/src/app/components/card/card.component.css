@@ -1,16 +1,15 @@
 .card {
- /* width: 100%; /* Permite que Flexbox maneje el tamaño */
-  height: 350px; /* Asegura que todas las tarjetas tengan la misma altura */
-  display: flex; /* Flexbox para alinear contenido */
-  flex-direction: column; /* Contenido apilado verticalmente */
-  align-items: center; /* Centra los elementos dentro de la tarjeta */
-  justify-content: space-between; /* Distribución uniforme del contenido interno */
+  width: 100%; /* Permite que el contenedor se adapte */
+  max-width: 350px; /* Ajusta este valor según tu diseño */
+  height: auto; /* Ajusta la altura automáticamente según el contenido */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   background-color: #FAFAFA;
-  border-radius: 10px; /* Bordes redondeados */
- /* box-sizing: border-box; /* Asegura consistencia con el relleno */
+  border-radius: 10px;
+  overflow: hidden; /* Evita que el contenido se desborde */
 }
-
-
 
 .title {
   text-align: center;
@@ -24,20 +23,20 @@
 
 .image-container {
   width: 100%;
-  height: 200px; /* Controla la altura de la imagen */
-  overflow: hidden; /* Para evitar que la imagen sobresalga */
+  max-height: 200px; /* Ajusta la altura máxima para evitar que se salga */
+  aspect-ratio: 1 / 1; /* Mantiene la imagen cuadrada */
+  overflow: hidden;
   display: flex;
-  justify-content: center; /* Centra las imágenes horizontalmente */
-  align-items: center; /* Centra las imágenes verticalmente */
+  justify-content: center;
+  align-items: center;
 }
 
 img.ad-photo, img[mat-card-image] {
-  width: 100%; /* Ajusta al ancho completo del contenedor */
-  height: 100%; /* Ajusta a la altura del contenedor */
-  object-fit: cover; /* Llena el espacio de forma uniforme */
-  border-radius: 8px; /* Opcional: bordes redondeados */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
   display: block;
-  margin: 0 auto; /* Centra la imagen */
 }
 
 .user-name{

@@ -176,6 +176,11 @@ export class AuthService {
     return role ? role : 'guest'; // Si no hay rol, consideramos 'guest'
   }
 
+  getUsername(): string {
+    const username = localStorage.getItem('username');
+    return username ? username : 'guest'; // Si no hay username, consideramos 'guest'
+  }
+
   // Método para verificar si el usuario está autenticado
   isAuthenticated(): boolean {
     return this.userSubject.value !== null; // Comprobamos el estado del usuario con el BehaviorSubject
